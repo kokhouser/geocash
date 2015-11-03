@@ -7,5 +7,7 @@ application.debug=True
 
 application.secret_key = 'geocash' 
 
+
+
 if __name__ == '__main__':
     application.run()
