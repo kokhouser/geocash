@@ -16,8 +16,23 @@ class User(db.Model):
 	#geocaches = db.relationship('Geocache', backref='addedBy', lazy='dynamic')
 	loggedCaches = db.relationship("Geocache", secondary=association_table, backref="loggedUsers")
 
+	@property
 	def __repr__(self):
 		return '<User %r>' % (self.nickname)
+
+	@property
+	def serialize(self):
+		return {
+			'id':self.id,
+			'nickname':self.nickname,
+			'password':self.password,
+			'email':self.email,
+			'loggedCaches':self.serialize_many2many
+		}
+
+	@property
+	def serialize_many2many(self):
+		return [ item.serialize2 for item in self.loggedCaches]
 
 class Geocache(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -29,4 +44,29 @@ class Geocache(db.Model):
 
 	def __repr__(self):
 		return '<Geocache %r>' % (self.name)
+
+	@property
+	def serialize(self):
+		return {
+			'id':self.id,
+			'name':self.name,
+			'description':self.description,
+			'latitude':self.latitude,
+			'longitude':self.longitude,
+			'loggedUsers':self.serialize_many2many
+		}
+
+	@property
+	def serialize2(self):
+		return {
+			'id':self.id,
+			'name':self.name,
+			'description':self.description,
+			'latitude':self.latitude,
+			'longitude':self.longitude
+		}
+
+	@property
+	def serialize_many2many(self):
+		return [ item.serialize for item in self.loggedUsers]
 
