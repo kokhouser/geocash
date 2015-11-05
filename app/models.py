@@ -23,6 +23,8 @@ class Geocache(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(64))
 	description = db.Column(db.String(240))
+	latitude = db.Column(db.Float)
+	longitude = db.Column(db.Float)
 	#user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 	def __repr__(self):
