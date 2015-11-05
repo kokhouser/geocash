@@ -1,0 +1,10 @@
+branch-defaults:
+  master:
+    environment: geocash-dev
+global:
+  application_name: geocash
+  default_ec2_keyname: null
+  default_platform: Python 2.7
+  default_region: us-west-2
+  profile: shawn
+  sc: git
