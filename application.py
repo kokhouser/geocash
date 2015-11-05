@@ -11,9 +11,7 @@ application.secret_key = 'paradoksu'
 def index():
 	return 'Welcome to the Geocash API page.'
 
-@application.route("/api/getUsers")
-def api_getUsers():
-    return jsonify({'users': models.User.query.all()})
-
 if __name__ == "__main__":
+	manager = flask.ext.restless.APIManager(application, flask_sqlalchemy_db=db)
+	manager.create_api(models.User, methods=['GET', 'POST', 'DELETE'])
 	application.run()
