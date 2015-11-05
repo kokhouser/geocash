@@ -1,7 +1,6 @@
-from flask import Flask,render_template, flash, redirect, session, url_for,request
+from flask import Flask,render_template, flash, redirect, session, url_for,request, jsonify
 from app import application, db, models
-from app.forms import LoginForm
-from sqlalchemy.sql import exists
+import flask.ext.restless
 
 application = Flask(__name__)
 application.debug=True
@@ -9,46 +8,12 @@ application.debug=True
 application.secret_key = 'paradoksu' 
 
 @application.route("/")
-def blee():
-	return 'Index Page'
+def index():
+	return 'Welcome to the Geocash API page.'
 
-@application.route("/map", methods=['GET', 'POST'])
-def blah():
-	if request.method == 'POST':
-		#print (db.session.query(exists().where(models.Plant.longitude == request.form['longitude'])).scalar())
-		#print (request.form['ide'])
-		if db.session.query(exists().where(models.Plant.id == request.form['ide'])).scalar():
-			#print (db.session.query(exists().where(models.Plant.id == request.form['ide'])).scalar())
-			p = db.session.query(models.Plant).\
-				filter(models.Plant.id==request.form['ide'])
-			if 'delete' in request.form and request.form['delete'] == 'delete':
-				print ("Here!")
-				for i in p:
-					print (i)
-					db.session.delete(i)
-					db.session.commit()
-			else:
-				for i in p:
-				 	print (i)
-				 	i.commonName = request.form['commonName']
-				 	i.latinName = request.form['latinName']
-				 	db.session.commit()
-		else:
-			p = models.Plant(commonName = request.form['commonName'], latinName = request.form['latinName'], latitude = request.form['latitude'], longitude = request.form['longitude'])
-			db.session.add(p)
-			db.session.commit()
-	p = models.Plant.query.all()
-	plants = [dict(id=row.id, commonName=row.commonName, latinName=row.latinName, latitude=row.latitude, longitude=row.longitude) for row in p]
-	# Debug statement
-	#print plants
-	return render_template('map.html', plants = plants)
-
-@application.route('/login', methods=['GET', 'POST'])
-def bloo():
-	form = LoginForm()
-	if form.validate_on_submit():
-		return redirect(url_for('blah'))
-	return render_template('login.html', form=form)
+@application.route("/api/getUsers")
+def api_getUsers():
+    return jsonify({'users': models.User.query.all()})
 
 if __name__ == "__main__":
 	application.run()
