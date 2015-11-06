@@ -31,6 +31,15 @@ class User(db.Model):
 		}
 
 	@property
+	def serialize2(self):
+		return {
+			'id':self.id,
+			'nickname':self.nickname,
+			'password':self.password,
+			'email':self.email,
+		}
+
+	@property
 	def serialize_many2many(self):
 		return [ item.serialize2 for item in self.loggedCaches]
 
@@ -68,5 +77,5 @@ class Geocache(db.Model):
 
 	@property
 	def serialize_many2many(self):
-		return [ item.serialize for item in self.loggedUsers]
+		return [ item.serialize2 for item in self.loggedUsers]
 

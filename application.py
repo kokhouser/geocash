@@ -14,7 +14,44 @@ def index():
 @application.route("/users")
 def allUsers():
 	qryresult = models.User.query.all()
-	return jsonify(json_list=[i.serialize for i in qryresult], num_result=len([i.serialize for i in qryresult]))
+	return jsonify(num_results=len([i.serialize for i in qryresult]), objects=[i.serialize for i in qryresult])
+
+@application.route("/geocaches")
+def allCaches():
+	qryresult = models.Geocache.query.all()
+	return jsonify( num_results=len([i.serialize for i in qryresult]), objects=[i.serialize for i in qryresult])
+
+@application.route("/geocaches/add", methods=['POST'])
+def addCache():
+	if request.method == 'POST':
+		name = request.json['name']
+		description = request.json['description']
+		latitude = request.json['latitude']
+		longitude = request.json['longitude']
+		newCache = models.Geocache(name=name, description = description, latitude=latitude, longitude=longitude)
+		db.session.add(newCache)
+		db.session.commit()
+		return "Added " + newCache.name + "!\n"
+
+@application.route("/log/add", methods=['POST'])
+def addLog():
+	if request.method == 'POST':
+		userID = request.json['userID']
+		cacheID = request.json['cacheID']
+		k = db.session.query(models.Geocache).\
+			filter(models.Geocache.id==cacheID)
+		c = 0
+		for i in k:
+			c = i
+		l = db.session.query(models.User).\
+			filter(models.User.id==userID)
+		u = 0
+		for j in l:
+			u = j
+		c.loggedUsers.append(u)
+		db.session.commit()
+		return "Added log!"
+
 
 if __name__ == "__main__":
     manager = flask.ext.restless.APIManager(application, flask_sqlalchemy_db=db)
