@@ -175,7 +175,7 @@ function scene:create( event )
     local accGroup = display.newGroup( )
     local dblvl = 1
 
-    local accIMG = "img/acc.jpg"
+    local accIMG = "img/acc.png"
     panel.background = display.newRect( 0, 0, panel.width, panel.height )
     panel.background:setFillColor( .698, .875, .859 )
     accGroup:insert( panel.background )
@@ -187,7 +187,6 @@ function scene:create( event )
     panel.accPic = display.newImageRect( accIMG, 100, 100 )
     panel.accPic.x = -180
     panel.accPic.y = -480
-    panel.accPic:rotate( -90 )
     accGroup:insert( panel.accPic )
 
     local name = "Shawn Yap"
@@ -258,10 +257,10 @@ function scene:create( event )
 end
 
 -- Called immediately after scene has moved onscreen:
-function scene:enter( event )
-    local group = self.view
+-- function scene:enter( event )
+--     local group = self.view
 
-    print("entered")
+--     print("entered")
 
     -----------------------------------------------------------------------------
 
@@ -269,12 +268,12 @@ function scene:enter( event )
 
     -----------------------------------------------------------------------------
 
-end
+-- end
 
 
 -- Called when scene is about to move offscreen:
-function scene:exit( event )
-    local group = self.view
+-- function scene:exit( event )
+--     local group = self.view
 
     -----------------------------------------------------------------------------
 
@@ -282,12 +281,12 @@ function scene:exit( event )
 
     -----------------------------------------------------------------------------
 
-end
+-- end
 
 
 -- Called prior to the removal of scene's "view" (display group)
-function scene:destroy( event )
-    local group = self.view
+-- function scene:destroy( event )
+--     local group = self.view
 
     -----------------------------------------------------------------------------
 
@@ -295,7 +294,7 @@ function scene:destroy( event )
 
     -----------------------------------------------------------------------------
 
-end
+-- end
 
 ---------------------------------------------------------------------------------
 -- END OF YOUR IMPLEMENTATION
