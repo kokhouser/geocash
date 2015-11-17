@@ -1,6 +1,7 @@
 -- Include required files
 local composer = require( "composer" )
 local widget = require("widget")
+local json = require("json")
 
 -- Coordinates of mid x,y and (width, Height) of all screens
 local midY = display.contentCenterY
@@ -111,18 +112,18 @@ function scene:create( event )
 ---------------------------------------------------------------------------------
 
     -- Background
-    local bg = display.newRect( midX, midY+50, width, height - 100 )
-    bg:setFillColor( .886, .875, .882 )
-    group:insert( bg )
+    -- local bg = display.newRect( midX, midY+50, width, height - 100 )
+    -- bg:setFillColor( .886, .875, .882 )
+    -- group:insert( bg )
 
     -- Display Elements to screen
     local NavBar = display.newRect( midX, 100, width + 30, 100 )
     -- Convert hex colors and use percentage for colors
     NavBar:setFillColor( 0,.475, .42)
 
-    local MenuIcon = display.newImage( "img/ic_menu.png", 50, 100)
-    local AddIcon = display.newImage( "img/ic_add.png", width - 50, 100)
-    local backArrow = display.newImage( "img/ic_arrow_back.png", -50, 100 )
+    local MenuIcon = display.newImage( "Img/ic_menu.png", 50, 100)
+    local AddIcon = display.newImage( "Img/ic_add.png", width - 50, 100)
+    local backArrow = display.newImage( "Img/ic_arrow_back.png", -50, 100 )
 
     function backArrow:touch( event )
         if event.phase == "ended" then
@@ -176,7 +177,7 @@ function scene:create( event )
     local accGroup = display.newGroup( )
     local dblvl = 1
 
-    local accIMG = "img/acc.png"
+    local accIMG = "Img/acc.png"
     panel.background = display.newRect( 0, 0, panel.width, panel.height )
     panel.background:setFillColor( .698, .875, .859 )
     accGroup:insert( panel.background )
@@ -200,20 +201,20 @@ function scene:create( event )
     panel.Level:setFillColor( .33,.33,.33 )
     accGroup:insert( panel.Level )
 
-    panel.icon1 = display.newImage( "img/ic_person.png", -180, -270)-- display.newRect( -180, -270, 50, 50 )
+    panel.icon1 = display.newImage( "Img/ic_person.png", -180, -270)-- display.newRect( -180, -270, 50, 50 )
     
     panel.tap1 = display.newRect( 0, -290, panel.width, 150 )
     panel.tap1.alpha = 0
     panel.des1 = display.newText( "Friends Nearby", 50, -270, native.systemFont, 30 )
     panel.des1:setFillColor( .33,.33,.33 )
     
-    panel.icon2 = display.newImage( "img/ic_location.png", -180, -130)-- display.newRect( -180, -170, 50, 50 )
+    panel.icon2 = display.newImage( "Img/ic_location.png", -180, -130)-- display.newRect( -180, -170, 50, 50 )
     panel.tap2 = display.newRect( 0, -150, panel.width, 130 )
     panel.tap2.alpha = 0
     panel.des2 = display.newText( "Location", 50, -130, native.systemFont, 30 )
     panel.des2:setFillColor( .33,.33,.33 )
     
-    panel.icon3 = display.newImage( "img/ic_settings.png", -180, 0)-- display.newRect( -180, -70, 50, 50 )
+    panel.icon3 = display.newImage( "Img/ic_settings.png", -180, 0)-- display.newRect( -180, -70, 50, 50 )
     panel.tap3 = display.newRect( 0, -20, panel.width, 130 )
     panel.tap3.alpha = 0
     panel.des3 = display.newText( "Settings", 50, 0, native.systemFont, 30 )
@@ -240,6 +241,7 @@ function scene:create( event )
     local function mShow(event)
         if showTrue == "hidden" then
             panel:show()
+            panel:toFront( )
             showTrue = "shown"
         else
             panel:hide()
@@ -248,6 +250,48 @@ function scene:create( event )
 
     end
 
+    local myMap = native.newMapView( midX, midY, display.contentWidth, display.contentHeight-400 )
+    
+    local function locationHandler( event )
+
+        local currentLocation = myMap:getUserLocation()
+
+        if ( currentLocation.errorCode or ( currentLocation.latitude == 0 and currentLocation.longitude == 0 ) ) then
+            locationText.text = currentLocation.errorMessage
+
+            attempts = attempts + 1
+
+            if ( attempts > 10 ) then
+                native.showAlert( "No GPS Signal", "Can't sync with GPS.", { "Okay" } )
+            else
+                timer.performWithDelay( 1000, locationHandler )
+            end
+        else
+            locationText.text = "Current location: " .. currentLocation.latitude .. "," .. currentLocation.longitude
+            myMap:setCenter( currentLocation.latitude, currentLocation.longitude )
+            --myMap:addMarker( currentLocation.latitude, currentLocation.longitude )
+        end
+    end
+
+    local function networkListener( event )
+
+        if ( event.isError ) then
+            print( "Network error!" )
+        else
+            print ( "RESPONSE: " .. event.response )
+            local decoded, pos, msg = json.decode( event.response )
+            if not decoded then
+                print( "Decode failed at "..tostring(pos)..": "..tostring(msg) )
+            else
+                print( decoded.objects[2].description )
+                myMap.mapType = "standard"
+                locationHandler()
+            end
+        end
+    end
+
+    print ("Here")
+    network.request( "http://geocash.elasticbeanstalk.com/geocaches", "GET", networkListener )
 
     MenuIcon:addEventListener( "tap", mShow )  
 
@@ -258,44 +302,25 @@ function scene:create( event )
 end
 
 -- Called immediately after scene has moved onscreen:
--- function scene:enter( event )
---     local group = self.view
-
---     print("entered")
-
-    -----------------------------------------------------------------------------
-
-    --  INSERT code here (e.g. start timers, load audio, start listeners, etc.)
-
-    -----------------------------------------------------------------------------
-
--- end
+function scene:enter( event )
+     local group = self.view
+     --network.request( "http://geocash.elasticbeanstalk.com/users", "GET", networkListener )
+end
 
 
 -- Called when scene is about to move offscreen:
--- function scene:exit( event )
---     local group = self.view
-
-    -----------------------------------------------------------------------------
-
-    --  INSERT code here (e.g. stop timers, remove listeners, unload sounds, etc.)
-
-    -----------------------------------------------------------------------------
-
--- end
+function scene:exit( event )
+    local group = self.view
 
 
--- Called prior to the removal of scene's "view" (display group)
--- function scene:destroy( event )
---     local group = self.view
+end
 
-    -----------------------------------------------------------------------------
 
-    --  INSERT code here (e.g. remove listeners, widgets, save state, etc.)
+--Called prior to the removal of scene's "view" (display group)
+function scene:destroy( event )
+    local group = self.view
 
-    -----------------------------------------------------------------------------
-
--- end
+end
 
 ---------------------------------------------------------------------------------
 -- END OF YOUR IMPLEMENTATION
@@ -305,15 +330,15 @@ end
 scene:addEventListener( "create", scene )
 
 -- "enter" event is dispatched whenever scene transition has finished
--- scene:addEventListener( "enter", scene )
+scene:addEventListener( "enter", scene )
 
 -- "exit" event is dispatched before next scene's transition begins
--- scene:addEventListener( "exit", scene )
+scene:addEventListener( "exit", scene )
 
 -- "destroy" event is dispatched before view is unloaded, which can be
 -- automatically unloaded in low memory situations, or explicitly via a call to
 -- storyboard.purgeScene() or storyboard.removeScene().
--- scene:addEventListener( "destroy", scene )
+scene:addEventListener( "destroy", scene )
 
 ---------------------------------------------------------------------------------
 
