@@ -140,6 +140,7 @@ function scene:create( event )
 
     function AddIcon:touch( event )
         if event.phase == "ended" then
+            panel:hide()
             composer.gotoScene( "scene1" , options )
             if back == false then
                 backArrow.isVisible = true
@@ -160,7 +161,7 @@ function scene:create( event )
 -- Menu Content
 ---------------------------------------------------------------------------------
 
-    local panel = widget.newPanel{
+    panel = widget.newPanel{
         location = "left",
         onComplete = panelTransDone,
         width = width*0.65,
