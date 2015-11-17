@@ -252,11 +252,12 @@ function scene:create( event )
 
     local myMap = native.newMapView( midX, midY, display.contentWidth, display.contentHeight-400 )
 
-    local function locationHandler( event )
+    local function locationHandler( event, decoded )
 
         local currentLocation = myMap:getUserLocation()
-
+        print ("First Here!")
         if ( currentLocation.errorCode or ( currentLocation.latitude == 0 and currentLocation.longitude == 0 ) ) then
+            print ("Second here!!")
             locationText.text = currentLocation.errorMessage
 
             attempts = attempts + 1
@@ -267,9 +268,9 @@ function scene:create( event )
                 timer.performWithDelay( 1000, locationHandler )
             end
         else
-            locationText.text = "Current location: " .. currentLocation.latitude .. "," .. currentLocation.longitude
+            --locationText.text = "Current location: " .. currentLocation.latitude .. "," .. currentLocation.longitude
+            print ("Here!")
             myMap:setCenter( currentLocation.latitude, currentLocation.longitude )
-            --myMap:addMarker( currentLocation.latitude, currentLocation.longitude )
         end
     end
 
@@ -278,20 +279,23 @@ function scene:create( event )
         if ( event.isError ) then
             print( "Network error!" )
         else
-            print ( "RESPONSE: " .. event.response )
+            --print ( "RESPONSE: " .. event.response )
             local decoded, pos, msg = json.decode( event.response )
             if not decoded then
                 print( "Decode failed at "..tostring(pos)..": "..tostring(msg) )
             else
-                local numCache = decoded.num_results
                 myMap.mapType = "standard"
-                locationHandler()
+                --print (decoded.num_results)
+                local numCache = decoded.num_results
+                print (numCache)
                 for i=1, numCache, 1 do
+                    print (i)
                     local options = 
                     { 
                         title = decoded.objects[i].name, 
                         subtitle = decoded.objects[i].description, 
                     }
+                    print (decoded.objects[i].latitude)
                     local result, errorMessage = myMap:addMarker(tonumber(decoded.objects[i].latitude), tonumber(decoded.objects[i].longitude), options )
                     if ( result ) then
                         print( "Marker added" )
@@ -299,11 +303,11 @@ function scene:create( event )
                         print( errorMessage )
                     end
                 end
+                locationHandler(decoded)
+
             end
         end
     end
-
-    print ("Here")
     network.request( "http://geocash.elasticbeanstalk.com/geocaches", "GET", networkListener )
 
     MenuIcon:addEventListener( "tap", mShow )  
