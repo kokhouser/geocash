@@ -251,7 +251,7 @@ function scene:create( event )
     end
 
     local myMap = native.newMapView( midX, midY, display.contentWidth, display.contentHeight-400 )
-    
+
     local function locationHandler( event )
 
         local currentLocation = myMap:getUserLocation()
@@ -283,9 +283,22 @@ function scene:create( event )
             if not decoded then
                 print( "Decode failed at "..tostring(pos)..": "..tostring(msg) )
             else
-                print( decoded.objects[2].description )
+                local numCache = decoded.num_results
                 myMap.mapType = "standard"
                 locationHandler()
+                for i=1, numCache, 1 do
+                    local options = 
+                    { 
+                        title = decoded.objects[i].name, 
+                        subtitle = decoded.objects[i].description, 
+                    }
+                    local result, errorMessage = myMap:addMarker(tonumber(decoded.objects[i].latitude), tonumber(decoded.objects[i].longitude), options )
+                    if ( result ) then
+                        print( "Marker added" )
+                    else
+                        print( errorMessage )
+                    end
+                end
             end
         end
     end
