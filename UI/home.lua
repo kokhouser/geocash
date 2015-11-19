@@ -110,7 +110,7 @@ function scene:create( event )
 -- -- --
 -- Create main scene objects and icon effect functions
 ---------------------------------------------------------------------------------
-
+     local bgGroup = display.newGroup( )
     -- Background
     -- local bg = display.newRect( midX, midY+50, width, height - 100 )
     -- bg:setFillColor( .886, .875, .882 )
@@ -124,6 +124,9 @@ function scene:create( event )
     local MenuIcon = display.newImage( "Img/ic_menu.png", 50, 100)
     local AddIcon = display.newImage( "Img/ic_add.png", width - 50, 100)
     local backArrow = display.newImage( "Img/ic_arrow_back.png", -50, 100 )
+    bgGroup:insert(MenuIcon)
+    bgGroup:insert(AddIcon)
+    bgGroup:toFront( )
 
     function backArrow:touch( event )
         if event.phase == "ended" then
@@ -172,8 +175,7 @@ function scene:create( event )
         outEasing = easing.outCubic
     }
     -- Grouping related objects together
-    local mGroup = display.newGroup()
-    local bgGroup = display.newGroup( )
+    local mGroup = display.newGroup( )
     local accGroup = display.newGroup( )
     local dblvl = 1
 
@@ -237,21 +239,21 @@ function scene:create( event )
 -- -- --
 -- Slide menu control function
 ---------------------------------------------------------------------------------
+    local myMap = native.newMapView( midX, midY, display.contentWidth, display.contentHeight-400 )
 
     local function mShow(event)
         if showTrue == "hidden" then
             panel:show()
-            panel:toFront( )
+            myMap.alpha=0
             showTrue = "shown"
         else
+            myMap.alpha=1
             panel:hide()
             showTrue = "hidden"
         end
 
     end
-
-    local myMap = native.newMapView( midX, midY, display.contentWidth, display.contentHeight-400 )
-
+    
     local function locationHandler( event, decoded )
 
         local currentLocation = myMap:getUserLocation()
