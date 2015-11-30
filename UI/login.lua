@@ -70,7 +70,7 @@ function scene:create( event )
 	{
 
 		effect = "fromBottom",
-	    time = 700
+	    time = 400
 
 
 	-----------------------------------------------
@@ -84,13 +84,6 @@ function scene:create( event )
 	-----------------------------------------------
 	    
 	}
-	local options2 =
-	{
-
-		effect = "fromTop",
-	    time = 800
-	}
-
 	    if ( "ended" == event.phase ) then
 	    	mainGroup.isVisible = false
 	        composer.gotoScene( "Register" , options)
@@ -103,7 +96,7 @@ function scene:create( event )
 		{
 
 			effect = "fromRight",
-		    time = 800
+		    time = 500
 		}
 
 	    if ( "ended" == event.phase ) then
