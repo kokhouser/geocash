@@ -29,7 +29,7 @@ def login():
 		return "Error logging in."
 
 @application.route("/users/add", methods=['POST'])
-def addCache():
+def addUser():
 	if request.method == 'POST':
 		nickname = request.json['nickname']
 		password = request.json['password']
