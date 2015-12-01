@@ -16,6 +16,22 @@ def allUsers():
 	qryresult = models.User.query.all()
 	return jsonify(num_results=len([i.serialize for i in qryresult]), objects=[i.serialize for i in qryresult])
 
+@application.route("/login", methods=['POST'])
+def login():
+	if request.method == 'POST':
+		email = request.json['email']
+		password = request.json['password']
+		l = db.session.query(models.User).\
+			filter(models.User.email==email)
+		if (len(l) == 0):
+		 	return jsonify(login_status="false")
+		for j in l:
+		 	if (j.password == password):
+		 		return jsonify(login_status="true")
+			else:
+				return jsonify(login_status="false")
+
+
 @application.route("/geocaches")
 def allCaches():
 	qryresult = models.Geocache.query.all()
