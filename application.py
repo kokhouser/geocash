@@ -25,8 +25,8 @@ def login():
 			filter(models.User.email==email)
 		for j in l:
 		 	if (j.password == password):
-		 		return jsonify(login_status="true")
-		return jsonify(login_status="false")
+		 		return "Logged in!"
+		return "Error logging in."
 
 
 @application.route("/geocaches")
