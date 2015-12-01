@@ -23,13 +23,10 @@ def login():
 		password = request.json['password']
 		l = db.session.query(models.User).\
 			filter(models.User.email==email)
-		if (len(l) == 0):
-		 	return jsonify(login_status="false")
 		for j in l:
 		 	if (j.password == password):
 		 		return jsonify(login_status="true")
-			else:
-				return jsonify(login_status="false")
+		return jsonify(login_status="false")
 
 
 @application.route("/geocaches")
