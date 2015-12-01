@@ -28,6 +28,17 @@ def login():
 		 		return "Logged in!"
 		return "Error logging in."
 
+@application.route("/users/add", methods=['POST'])
+def addCache():
+	if request.method == 'POST':
+		nickname = request.json['nickname']
+		password = request.json['password']
+		email = request.json['email']
+		newUser = models.User(nickname=nickname, password = password, email=email)
+		db.session.add(newUser)
+		db.session.commit()
+		return "Added " + newUser.nickname + "!\n"
+
 
 @application.route("/geocaches")
 def allCaches():
