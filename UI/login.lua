@@ -1,5 +1,6 @@
 local composer = require( "composer" )
 local widget = require("widget")
+local json = require("json")
 
 -- Coordinates of mid x,y and (width, Height) of all screens
 local midY = display.contentCenterY
@@ -46,14 +47,14 @@ function scene:create( event )
 	    end
 	end
 
-	local usernameField = native.newTextField( midX, midY, 2/3*width, 60 )
+	local usernameField = native.newTextField( midX, midY- 100, 2/3*width, 120 )
 	usernameField.font = native.newFont( native.systemFontBold, 24 )
 	usernameField.inputType = "email"
 	usernameField.placeholder = " Username "
 	usernameField:setTextColor( 0.4, 0.4, 0.8 )
 	usernameField:addEventListener( "userInput", onUsername )
 
-	local passwordField = native.newTextField( midX, midY+80, 2/3*width, 60 )
+	local passwordField = native.newTextField( midX, midY+40, 2/3*width, 120 )
 	passwordField.font = native.newFont( native.systemFontBold, 24 )
 	passwordField.inputType = "default"
 	passwordField.placeholder = " Password "
@@ -61,7 +62,7 @@ function scene:create( event )
 	passwordField:setTextColor( 0.4, 0.4, 0.8 )
 	passwordField:addEventListener( "userInput", onPassword )
 
-	local submit = display.newRect(midX, midY+200,  2/3*width, 60)
+	local submit = display.newRect(midX, midY+200,  2/3*width, 100)
 	
 
 	-- Function to handle button events
@@ -98,11 +99,36 @@ function scene:create( event )
 			effect = "fromRight",
 		    time = 500
 		}
-
 	    if ( "ended" == event.phase ) then
 	    	mainGroup.isVisible = false
-	        composer.gotoScene( "home" , options)
-	    end  
+	        
+	    sendInfo = {["email"] = usernameField.text, ["password"] = passwordField.text }
+	    
+	    print (sendInfo)
+
+	    local function networkListener(event)
+	    	if (event.isError) then
+	    		print("Network Error!")
+	    	elseif event.response == "Error logging in." then
+	    		print("Wrong User/Pass.")
+	    	else
+	    		print ("Response: " ..event.response )
+	    		composer.gotoScene( "home" , options)
+	    	end
+	    end
+
+	    local headers = {
+	    	["Content-Type"] = "application/json"
+		}
+
+		local params = {}
+		params.headers=headers
+		params.body=json.encode( sendInfo )
+
+		print ( "params.body: "..params.body )
+
+		network.request( "http://geocash.elasticbeanstalk.com/login", "POST", networkListener, params)
+	end
 	end
 
 
@@ -110,13 +136,13 @@ function scene:create( event )
 	{
 	    x = midX,
 	    y = midY+200,
-	    width= 2/3*width,
-	    height = 60,
+	    width= width,
+	    height = 100,
 	    id = "login",
 	    label = "Login",
 	    labelAlign = "center",
 	    labelColor = { default={ black }, over={ black } },
-	    fontSize = 30,
+	    fontSize = 50,
 	    onRelease = loginhere
 	}
 
@@ -124,14 +150,14 @@ function scene:create( event )
 	local Register = widget.newButton
 	{
 	    x = midX,
-	    y = midY+300,
-	    width= 2/3*width,
-	    height = 60,
+	    y = midY+320,
+	    width= width,
+	    height = 100,
 	    id = "Register",
 	    label = "Not yet registered?",
 	    labelAlign = "center",
-	    labelColor = { default={ 1,1,1 }, over={ 1,1,1 } },
-	    fontSize = 30,
+	    labelColor = { default={ 0, .50, 1 }, over={ 1,1,1 } },
+	    fontSize = 50,
 	    onRelease = Signuphere
 	}
 
@@ -141,6 +167,8 @@ function scene:create( event )
 	mainGroup:insert(login)
 	mainGroup:insert(Register)
 	group:insert(mainGroup)
+	mainGroup.alpha = 0
+	transition.to( mainGroup, { time=1000, alpha=1 } )
 
 
     -----------------------------------------------------------------------------

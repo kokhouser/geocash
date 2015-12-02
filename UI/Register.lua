@@ -10,6 +10,7 @@ local nUser = 0
 
 ----------------------------------------------------------------------------------
 local scene = composer.newScene()
+local prevScene = composer.getSceneName( "login" )
 
 ----------------------------------------------------------------------------------
 -- 
@@ -28,7 +29,7 @@ local scene = composer.newScene()
 function scene:create( event )
     local group = self.view
 
-    local regTex = display.newText( " Register ", midX, midY - 200, native.systemFont, 100 )
+    local regTex = display.newText( " Register ", midX, midY - 250, native.systemFont, 100 )
 
     local function inputListener( event )
         if event.phase == "began" then
@@ -48,14 +49,14 @@ function scene:create( event )
     bg:setFillColor( 1,1,1 )
     bg.alpha = 0.6
 
-    local usernameField = native.newTextField( midX, midY, 2/3*width, 60 )
+    local usernameField = native.newTextField( midX, midY-100, 2/3*width, 120 )
     usernameField.font = native.newFont( native.systemFontBold, 24 )
     usernameField.inputType = "email"
     usernameField.placeholder = " e-mail@gmail.com "
     usernameField:setTextColor( 0.4, 0.4, 0.8 )
     -- usernameField:addEventListener( "userInput", onUsername )
 
-    local passwordField = native.newTextField( midX, midY+80, 2/3*width, 60 )
+    local passwordField = native.newTextField( midX, midY+40, 2/3*width, 120 )
     passwordField.font = native.newFont( native.systemFontBold, 24 )
     passwordField.inputType = "default"
     passwordField.placeholder = " Password "
@@ -72,7 +73,7 @@ function scene:create( event )
     -- --passwordField:addEventListener( "userInput", onPassword )
 
     local function SubForm( event )
-        local optionsw =
+        local options =
         {
 
             effect = "fromRight",
@@ -86,19 +87,48 @@ function scene:create( event )
         end  
     end
 
-    local rSub = display.newRect(midX, midY+200,  2/3*width, 60)
+    local rSub = display.newRect(midX, midY+200,  2/3*width, 100)
     local rSubBut = widget.newButton
     {
         x = midX,
         y = midY+200,
         width= 2/3*width,
-        height = 60,
+        height = 100,
         id = "rSubBut",
         label = "Sign up",
         labelAlign = "center",
         labelColor = { default={ black }, over={ black } },
-        fontSize = 30,
+        fontSize = 50,
         onRelease = SubForm
+    }
+
+    local function goLogin( event )
+        local options =
+        {
+
+            effect = "fromTop",
+            time = 500
+        }
+
+        if ( "ended" == event.phase ) then
+            
+            -- mainGroup.isVisible = true
+            composer.gotoScene( "login" , options)
+        end  
+    end
+
+    local RegExst = widget.newButton
+    {
+        x = midX,
+        y = midY+320,
+        width= width,
+        height = 100,
+        id = "signedup",
+        label = "Already Signed up?",
+        labelAlign = "center",
+        labelColor = { default={ 0, .50, 1 }, over={ 1,1,1 } },
+        fontSize = 50,
+        onRelease = goLogin
     }
 
     group:insert( regTex )
@@ -106,7 +136,7 @@ function scene:create( event )
     group:insert( rSubBut )
     group:insert( usernameField )
     group:insert( passwordField )
-    --group:insert( passwordField2 )
+    group:insert( RegExst )
     group:insert( bg )
     -----------------------------------------------------------------------------
 
