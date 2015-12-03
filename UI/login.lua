@@ -68,23 +68,13 @@ function scene:create( event )
 
 	-- Function to handle button events
 	local function Signuphere( event )
-	local options =
-	{
+		local options =
+		{
 
-		effect = "fromBottom",
-	    time = 400
-
-	-----------------------------------------------
-	-- 		params (optional)
-	-- Table. An optional table containing any kind of custom data that should be transferred to the scene. 
-	-- In the specified scene, this data can be accessed via event.params in the create event or show event.\
-	--params = {
-		    --     sampleVar1 = "my sample variable",
-		    --     sampleVar2 = "another sample variable"
-		    -- }
-	-----------------------------------------------
-	    
-	}
+			effect = "fromBottom",
+		    time = 400
+		    
+		}
 	    if ( "ended" == event.phase ) then
 	    	usernameField.isVisible = false
 			passwordField.isVisible = false

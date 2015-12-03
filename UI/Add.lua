@@ -1,5 +1,6 @@
 local composer = require( "composer" )
 local widget = require("widget")
+local json = require("json")
 
 -- Coordinates of mid x,y and (width, Height) of all screens
 local midY = display.contentCenterY
@@ -25,46 +26,127 @@ local scene = composer.newScene()
 
 -- Called when the scene's view does not exist:
 function scene:create( event )
+        local options =
+    {
+        effect = "slideLeft",
+        time = 400,
+        params = event.params.username
+    }
     local group = self.view
-    
+    local currentLat = 0
+    local currentLong = 0
     local bg = display.newRect(midX, midY+80, width, height - 140)
     bg:setFillColor( .886, .875, .882  )
 
-    local TitleText = display.newText( "TITLE", 200, 250, native.systemFontBold, 70 )
+    local TitleText = display.newText( "Cache Name", display.contentWidth/2, display.contentHeight/5, native.systemFontBold, 70 )
     TitleText:setFillColor( Black )
 
-    local TitleField = native.newTextField( midX - 70, 400, 2/3*width, 120 )
-    TitleField.font = native.newFont( native.systemFontBold, 24 )
-    TitleField.inputType = "email"
-    TitleField.placeholder = " Username "
+    local TitleField = native.newTextField( display.contentWidth/2, display.contentHeight/5 + 100, 3/4*width, 120 )
+    TitleField.font = native.newFont( native.systemFontBold, 30 )
+    TitleField.inputType = "default"
     TitleField:setTextColor( 0.4, 0.4, 0.8 )
-    -- TitleField:addEventListener( "userInput", onUsername )
+    TitleField.text = ""
 
-    local function inputListener( event )
-        if event.phase == "began" then
-            -- user begins editing textBox
-            print( event.text )
 
-        elseif event.phase == "ended" then
-            -- do something with textBox text
-            print( event.target.text )
+    local DescText = display.newText( "Description", display.contentWidth/2, 2*display.contentHeight/5 - 50, native.systemFontBold, 70 )
+    DescText:setFillColor( Black )
 
-        elseif event.phase == "editing" then
-            print( event.newCharacters )
-            print( event.oldText )
-            print( event.startPosition )
-            print( event.text )
+    local DescriptionBox = native.newTextBox( display.contentWidth/2, 2*display.contentHeight/5 + 150, 2.3/3*width, 300 )
+    DescriptionBox.text = ""
+    DescriptionBox.isEditable = true
+
+    local LatText = display.newText( "Latitude", display.contentWidth/4, 3*display.contentHeight/5 + 80, native.systemFontBold, 50 )
+    LatText:setFillColor( Black )
+
+    local LatField = native.newTextField( display.contentWidth/4, 3*display.contentHeight/5 + 150, 1/4*width, 80 )
+    LatField.font = native.newFont( native.systemFontBold, 30 )
+    LatField.inputType = "default"
+    LatField:setTextColor( 0.4, 0.4, 0.8 )
+    LatField.text = ""
+
+    local LongText = display.newText( "Latitude", 3*display.contentWidth/4, 3*display.contentHeight/5 + 80, native.systemFontBold, 50 )
+    LongText:setFillColor( Black )
+
+    local LongField = native.newTextField( 3*display.contentWidth/4, 3*display.contentHeight/5 + 150, 1/4*width, 80 )
+    LongField.font = native.newFont( native.systemFontBold, 30 )
+    LongField.inputType = "default"
+    LongField:setTextColor( 0.4, 0.4, 0.8 )
+    LongField.text = ""
+
+    local locationHandler = function( event )
+
+    -- Check for error (user may have turned off location services)
+    if ( event.errorCode ) then
+            native.showAlert( "GPS Location Error", event.errorMessage, {"OK"} )
+            print( "Location error: " .. tostring( event.errorMessage ) )
+        else
+            currentLat = event.latitude
+            currentLong = event.longitude
+            LatField.text = currentLat
+            LongField.text = currentLong
+        end
+    end
+    
+
+    local function onComplete( event )
+       if event.action == "clicked" then
+            local i = event.index
+            if i == 1 then
+                composer.gotoScene( "home" , options)
+            end
         end
     end
 
-    local DescText = display.newText( "Description", 300, midY-300, native.systemFontBold, 70 )
-    DescText:setFillColor( Black )
+    local function networkListener(event)
+        if (event.isError) then
+            print("Network Error!")
+        else
+            print ("Response: " ..event.response )
+            local alert = native.showAlert( "Success", "Cache Added!", {"OK"}, onComplete )
+        end
+    end
 
-    local DescriptionBox = native.newTextBox( midX+20, midY, 2.5/3*width, 400 )
-    DescriptionBox.text = ""
-    DescriptionBox.isEditable = true
-    DescriptionBox:addEventListener( "userInput", inputListener )
+    local function submitCache (event)
+        print ("Submit pressed!")
+        if ( "ended" == event.phase ) then
+            sendInfo = {["name"] = TitleField.text, ["description"] = DescriptionBox.text, ["latitude"] = LatField.text, ["longitude"] = LongField.text }
+            print (sendInfo)
+            local headers = {
+                ["Content-Type"] = "application/json"
+            }
 
+            local params = {}
+            params.headers=headers
+            params.body=json.encode( sendInfo )
+
+            print ( "params.body: "..params.body )
+
+            network.request( "http://geocash.elasticbeanstalk.com/geocaches/add", "POST", networkListener, params)
+        end
+    end
+
+    local CHOSENBUTTON = widget.newButton{
+        x = midX,
+        y = 3*display.contentHeight/4 + 100,
+        width= 2/3*width,
+        height = 100,
+        onEvent = submitCache,
+        labelAlign = "center",
+        labelColor = { default={ 0, .50, 1 }, over={ 1,1,1 } },
+        fontSize = 50,
+        label = "Submit"
+    }
+
+    group:insert(bg)
+    group:insert(TitleText)
+    group:insert(TitleField)
+    group:insert(DescText)
+    group:insert(DescriptionBox)
+    group:insert(LatField)
+    group:insert(LatText)
+    group:insert(LongField)
+    group:insert(LongText)
+    group:insert(CHOSENBUTTON)
 
     -----------------------------------------------------------------------------
 
@@ -72,6 +154,7 @@ function scene:create( event )
     --  Example use-case: Restore 'group' from previously saved state.
 
     -----------------------------------------------------------------------------
+    Runtime:addEventListener( "location", locationHandler )
 
 end
 

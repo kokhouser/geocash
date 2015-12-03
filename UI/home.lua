@@ -12,6 +12,7 @@ local height = display.contentHeight
 ----------------------------------------------------------------------------------
 local scene = composer.newScene()
 local back = false
+local myMap
 
 ----------------------------------------------------------------------------------
 -- 
@@ -25,11 +26,16 @@ local back = false
 ---------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
 ---------------------------------------------------------------------------------
+function scene:show(event)
+    local group = self.view
+    myMap.x = midX
+    myMap.y = midY
+end
 
 -- Called when the scene's view does not exist:
 function scene:create( event )
     local group = self.view
-    local myMap = native.newMapView( midX, midY, display.contentWidth, display.contentHeight-400 )
+    myMap = native.newMapView( midX, midY, display.contentWidth, display.contentHeight-400 )
 ---------------------------------------------------------------------------------
 -- SlideMenu Effect
 ---------------------------------------------------------------------------------
@@ -37,7 +43,8 @@ function scene:create( event )
         local options =
         {
             effect = "slideLeft",
-            time = 400
+            time = 400,
+            params = {username = event.params.username}
         }
 
 
@@ -147,6 +154,8 @@ function scene:create( event )
     function AddIcon:touch( event )
         if event.phase == "ended" then
             panel:hide()
+            myMap.x = -500
+            myMap.y = -500
             composer.gotoScene( "Add" , options )
             myMap.alpha = 0 
             if back == false then
@@ -322,15 +331,9 @@ function scene:create( event )
 
 end
 
--- Called immediately after scene has moved onscreen:
-function scene:enter( event )
-     local group = self.view
-     --network.request( "http://geocash.elasticbeanstalk.com/users", "GET", networkListener )
-end
-
 
 -- Called when scene is about to move offscreen:
-function scene:exit( event )
+function scene:hide( event )
     local group = self.view
 
 
@@ -351,10 +354,10 @@ end
 scene:addEventListener( "create", scene )
 
 -- "enter" event is dispatched whenever scene transition has finished
-scene:addEventListener( "enter", scene )
+scene:addEventListener( "show", scene )
 
 -- "exit" event is dispatched before next scene's transition begins
-scene:addEventListener( "exit", scene )
+scene:addEventListener( "hide", scene )
 
 -- "destroy" event is dispatched before view is unloaded, which can be
 -- automatically unloaded in low memory situations, or explicitly via a call to
