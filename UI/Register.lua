@@ -1,5 +1,6 @@
 local composer = require( "composer" )
 local widget = require("widget")
+local json = require("json")
 
 -- Coordinates of mid x,y and (width, Height) of all screens
 local midY = display.contentCenterY
@@ -29,7 +30,7 @@ local prevScene = composer.getSceneName( "login" )
 function scene:create( event )
     local group = self.view
 
-    local regTex = display.newText( " Register ", midX, midY - 250, native.systemFont, 100 )
+    local regTex = display.newText( " Register ", midX, midY - 390, native.systemFont, 100 )
 
     local function inputListener( event )
         if event.phase == "began" then
@@ -49,12 +50,18 @@ function scene:create( event )
     bg:setFillColor( 1,1,1 )
     bg.alpha = 0.6
 
-    local usernameField = native.newTextField( midX, midY-100, 2/3*width, 120 )
+    local usernameField = native.newTextField( midX, midY-240, 2/3*width, 120 )
     usernameField.font = native.newFont( native.systemFontBold, 24 )
     usernameField.inputType = "email"
     usernameField.placeholder = " e-mail@gmail.com "
     usernameField:setTextColor( 0.4, 0.4, 0.8 )
     -- usernameField:addEventListener( "userInput", onUsername )
+
+    local nicknameField = native.newTextField( midX, midY-100, 2/3*width, 120 )
+    nicknameField.font = native.newFont( native.systemFontBold, 24 )
+    nicknameField.inputType = "text"
+    nicknameField.placeholder = " John Doe "
+    nicknameField:setTextColor( 0.4, 0.4, 0.8 )
 
     local passwordField = native.newTextField( midX, midY+40, 2/3*width, 120 )
     passwordField.font = native.newFont( native.systemFontBold, 24 )
@@ -63,6 +70,7 @@ function scene:create( event )
     passwordField.isSecure = true
     passwordField:setTextColor( 0.4, 0.4, 0.8 )
     -- passwordField:addEventListener( "userInput", onPassword )
+
 
     -- local passwordField2 = native.newTextField( midX, midY, 2/3*width, 60 )
     -- passwordField.font = native.newFont( native.systemFontBold, 24 )
@@ -77,13 +85,40 @@ function scene:create( event )
         {
 
             effect = "fromRight",
-            time = 500
+            time = 500,
+            params = {username=usernameField.text}
         }
 
         if ( "ended" == event.phase ) then
+            if (usernameField.text == "text" or nicknameField.text == "text" or passwordField.text == "text" ) then
+
+            else
+                sendInfo = {["email"] = usernameField.text, ["nickname"] = nicknameField.text, ["password"] = passwordField.text }
             
-            -- mainGroup.isVisible = false
-            composer.gotoScene( "home" , options)
+                print (sendInfo)
+                local function networkListener(event)
+                    if (event.isError) then
+                        print("Network Error!")
+                    else
+                        print ("Response: " ..event.response )
+                        nicknameField.isVisible = false
+                        usernameField.isVisible = false
+                        passwordField.isVisible = false
+                        composer.gotoScene( "home" , options)
+                    end
+                end
+                local headers = {
+                    ["Content-Type"] = "application/json"
+                }
+
+                local params = {}
+                params.headers=headers
+                params.body=json.encode( sendInfo )
+
+                print ( "params.body: "..params.body )
+
+                network.request( "http://geocash.elasticbeanstalk.com/users/add", "POST", networkListener, params)
+            end
         end  
     end
 
@@ -117,26 +152,12 @@ function scene:create( event )
         end  
     end
 
-    local RegExst = widget.newButton
-    {
-        x = midX,
-        y = midY+320,
-        width= width,
-        height = 100,
-        id = "signedup",
-        label = "Already Signed up?",
-        labelAlign = "center",
-        labelColor = { default={ 0, .50, 1 }, over={ 1,1,1 } },
-        fontSize = 50,
-        onRelease = goLogin
-    }
-
     group:insert( regTex )
     group:insert( rSub )
     group:insert( rSubBut )
     group:insert( usernameField )
+    group:insert( nicknameField )
     group:insert( passwordField )
-    group:insert( RegExst )
     group:insert( bg )
     -----------------------------------------------------------------------------
 

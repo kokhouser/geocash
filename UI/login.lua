@@ -50,7 +50,7 @@ function scene:create( event )
 	local usernameField = native.newTextField( midX, midY- 100, 2/3*width, 120 )
 	usernameField.font = native.newFont( native.systemFontBold, 24 )
 	usernameField.inputType = "email"
-	usernameField.placeholder = " Username "
+	usernameField.placeholder = " Email "
 	usernameField:setTextColor( 0.4, 0.4, 0.8 )
 	usernameField:addEventListener( "userInput", onUsername )
 
@@ -74,7 +74,6 @@ function scene:create( event )
 		effect = "fromBottom",
 	    time = 400
 
-
 	-----------------------------------------------
 	-- 		params (optional)
 	-- Table. An optional table containing any kind of custom data that should be transferred to the scene. 
@@ -87,6 +86,8 @@ function scene:create( event )
 	    
 	}
 	    if ( "ended" == event.phase ) then
+	    	usernameField.isVisible = false
+			passwordField.isVisible = false
 	    	mainGroup.isVisible = false
 	        composer.gotoScene( "Register" , options)
 	    end  
@@ -114,7 +115,15 @@ function scene:create( event )
 	    		print("Wrong User/Pass.")
 	    	else
 	    		print ("Response: " ..event.response )
-	    		composer.gotoScene( "home" , options)
+	    		local options2 = 	{
+
+										effect = "fromBottom",
+									    time = 400,
+									    params = {username = usernameField.text}
+									}
+				usernameField.isVisible = false
+				passwordField.isVisible = false
+	    		composer.gotoScene( "home" , options2)
 	    	end
 	    end
 
@@ -182,46 +191,33 @@ function scene:create( event )
 end
 
 
--- Called immediately after scene has moved onscreen:
-function scene:enter( event )
-    local group = self.view
 
-    print("entered")
+function scene:hide( event )
 
-    -----------------------------------------------------------------------------
+   local sceneGroup = self.view
+   local phase = event.phase
 
-    --  INSERT code here (e.g. start timers, load audio, start listeners, etc.)
+   if ( phase == "will" ) then
+      -- Called when the scene is on screen (but is about to go off screen).
+      -- Insert code here to "pause" the scene.
+      -- Example: stop timers, stop animation, stop audio, etc.
+   elseif ( phase == "did" ) then
 
-    -----------------------------------------------------------------------------
-
+   end
 end
 
+function scene:show( event )
 
--- Called when scene is about to move offscreen:
-function scene:exit( event )
-    local group = self.view
+   local sceneGroup = self.view
+   local phase = event.phase
 
-
-    -----------------------------------------------------------------------------
-
-    --  INSERT code here (e.g. stop timers, remove listeners, unload sounds, etc.)
-
-    -----------------------------------------------------------------------------
-
+   if ( phase == "will" ) then
+      -- Called when the scene is still off screen (but is about to come on screen).
+   elseif ( phase == "did" ) then
+   		print("show")
+   end
 end
 
-
--- Called prior to the removal of scene's "view" (display group)
-function scene:destroy( event )
-    local group = self.view
-
-    -----------------------------------------------------------------------------
-
-    --  INSERT code here (e.g. remove listeners, widgets, save state, etc.)
-
-    -----------------------------------------------------------------------------
-
-end
 
 ---------------------------------------------------------------------------------
 -- END OF YOUR IMPLEMENTATION
@@ -230,16 +226,11 @@ end
 -- "createScene" event is dispatched if scene's view does not exist
 scene:addEventListener( "create", scene )
 
--- "enter" event is dispatched whenever scene transition has finished
-scene:addEventListener( "enter", scene )
+
+scene:addEventListener( "show", scene )
 
 -- "exit" event is dispatched before next scene's transition begins
-scene:addEventListener( "exit", scene )
-
--- "destroy" event is dispatched before view is unloaded, which can be
--- automatically unloaded in low memory situations, or explicitly via a call to
--- storyboard.purgeScene() or storyboard.removeScene().
-scene:addEventListener( "destroy", scene )
+scene:addEventListener( "hide", scene )
 
 ---------------------------------------------------------------------------------
 

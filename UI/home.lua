@@ -29,7 +29,7 @@ local back = false
 -- Called when the scene's view does not exist:
 function scene:create( event )
     local group = self.view
-
+    local myMap = native.newMapView( midX, midY, display.contentWidth, display.contentHeight-400 )
 ---------------------------------------------------------------------------------
 -- SlideMenu Effect
 ---------------------------------------------------------------------------------
@@ -131,6 +131,7 @@ function scene:create( event )
     function backArrow:touch( event )
         if event.phase == "ended" then
             composer.gotoScene( "home" , options )
+            myMap.alpha = 1 
             if back == true then
                 MenuIcon.isVisible = true
                 transition.to( MenuIcon, { x = MenuIcon.x + 200, time=500 } )
@@ -138,6 +139,7 @@ function scene:create( event )
                 backArrow.isVisible = false
                 back = false
                 AddIcon.isVisible = true
+
             end
         end
     end
@@ -146,13 +148,14 @@ function scene:create( event )
         if event.phase == "ended" then
             panel:hide()
             composer.gotoScene( "Add" , options )
+            myMap.alpha = 0 
             if back == false then
                 backArrow.isVisible = true
                 transition.to( MenuIcon, { x = MenuIcon.x - 200, time=500 } )
                 MenuIcon.isVisible = false
                 transition.to( backArrow, { x = backArrow.x + 100, time=500 } )
                 back = true                
-                AddIcon.isVisible = false 
+                AddIcon.isVisible = false
             end
         end
     end
@@ -193,7 +196,7 @@ function scene:create( event )
     panel.accPic.y = -480
     accGroup:insert( panel.accPic )
 
-    local name = "Shawn Yap"
+    local name = event.params.username
     panel.accName = display.newText( name , 40, -510, native.systemFontBold, 45 )
     panel.accName:setFillColor( .33,.33,.33 )
     accGroup:insert( panel.accName )
@@ -239,7 +242,6 @@ function scene:create( event )
 -- -- --
 -- Slide menu control function
 ---------------------------------------------------------------------------------
-    local myMap = native.newMapView( midX, midY, display.contentWidth, display.contentHeight-400 )
 
     local function mShow(event)
         if showTrue == "hidden" then
