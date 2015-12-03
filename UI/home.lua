@@ -145,7 +145,7 @@ function scene:create( event )
     function AddIcon:touch( event )
         if event.phase == "ended" then
             panel:hide()
-            composer.gotoScene( "scene1" , options )
+            composer.gotoScene( "Add" , options )
             if back == false then
                 backArrow.isVisible = true
                 transition.to( MenuIcon, { x = MenuIcon.x - 200, time=500 } )

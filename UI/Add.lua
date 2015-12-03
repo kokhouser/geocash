@@ -30,12 +30,41 @@ function scene:create( event )
     local bg = display.newRect(midX, midY+80, width, height - 140)
     bg:setFillColor( .886, .875, .882  )
 
-    local GeoDes = display.newRect( midX, height - 200 , width , height/3)    
-    GeoDes:setFillColor( 1,1,1 )
+    local TitleText = display.newText( "TITLE", 200, 250, native.systemFontBold, 70 )
+    TitleText:setFillColor( Black )
 
-    -- group:insert( GeoPic )
-    group:insert( GeoDes )
-    group:insert( bg )
+    local TitleField = native.newTextField( midX - 70, 400, 2/3*width, 120 )
+    TitleField.font = native.newFont( native.systemFontBold, 24 )
+    TitleField.inputType = "email"
+    TitleField.placeholder = " Username "
+    TitleField:setTextColor( 0.4, 0.4, 0.8 )
+    -- TitleField:addEventListener( "userInput", onUsername )
+
+    local function inputListener( event )
+        if event.phase == "began" then
+            -- user begins editing textBox
+            print( event.text )
+
+        elseif event.phase == "ended" then
+            -- do something with textBox text
+            print( event.target.text )
+
+        elseif event.phase == "editing" then
+            print( event.newCharacters )
+            print( event.oldText )
+            print( event.startPosition )
+            print( event.text )
+        end
+    end
+
+    local DescText = display.newText( "Description", 300, midY-300, native.systemFontBold, 70 )
+    DescText:setFillColor( Black )
+
+    local DescriptionBox = native.newTextBox( midX+20, midY, 2.5/3*width, 400 )
+    DescriptionBox.text = ""
+    DescriptionBox.isEditable = true
+    DescriptionBox:addEventListener( "userInput", inputListener )
+
 
     -----------------------------------------------------------------------------
 

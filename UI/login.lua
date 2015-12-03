@@ -63,6 +63,7 @@ function scene:create( event )
 	passwordField:addEventListener( "userInput", onPassword )
 
 	local submit = display.newRect(midX, midY+200,  2/3*width, 100)
+
 	
 
 	-- Function to handle button events
@@ -136,7 +137,7 @@ function scene:create( event )
 	{
 	    x = midX,
 	    y = midY+200,
-	    width= width,
+	    width= 2/3*width,
 	    height = 100,
 	    id = "login",
 	    label = "Login",
@@ -151,7 +152,7 @@ function scene:create( event )
 	{
 	    x = midX,
 	    y = midY+320,
-	    width= width,
+	    width= 2/3*width,
 	    height = 100,
 	    id = "Register",
 	    label = "Not yet registered?",
