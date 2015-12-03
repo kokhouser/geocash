@@ -35,9 +35,12 @@ def addUser():
 		password = request.json['password']
 		email = request.json['email']
 		newUser = models.User(nickname=nickname, password = password, email=email)
-		db.session.add(newUser)
-		db.session.commit()
-		return "Added " + newUser.nickname + "!\n"
+		try:
+			db.session.add(newUser)
+			db.session.commit()
+			return "Added " + newUser.nickname + "!\n"
+		except:
+			return "Error adding user."
 
 
 @application.route("/geocaches")
@@ -53,9 +56,12 @@ def addCache():
 		latitude = request.json['latitude']
 		longitude = request.json['longitude']
 		newCache = models.Geocache(name=name, description = description, latitude=latitude, longitude=longitude)
-		db.session.add(newCache)
-		db.session.commit()
-		return "Added " + newCache.name + "!\n"
+		try:
+			db.session.add(newCache)
+			db.session.commit()
+			return "Added " + newCache.name + "!\n"
+		except:
+			return "Error adding cache."
 
 @application.route("/log/add", methods=['POST'])
 def addLog():
@@ -73,8 +79,11 @@ def addLog():
 		for j in l:
 			u = j
 		c.loggedUsers.append(u)
-		db.session.commit()
-		return "Added log!"
+		try:
+			db.session.commit()
+			return "Added log!"
+		except:
+			return "Error adding log!"
 
 
 if __name__ == "__main__":
