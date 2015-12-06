@@ -30,7 +30,8 @@ local prevScene = composer.getSceneName( "login" )
 function scene:create( event )
     local group = self.view
 
-    local regTex = display.newText( " Register ", midX, midY - 390, native.systemFont, 100 )
+    local regTex = display.newText( " Register ", midX, midY - 450, native.systemFont, 100 )
+    regTex:setTextColor(0,0,0)
 
     local function inputListener( event )
         if event.phase == "began" then
@@ -46,21 +47,21 @@ function scene:create( event )
         end
     end
 
-    local bg = display.newRect( midX, midY, width, height )
-    bg:setFillColor( 1,1,1 )
-    bg.alpha = 0.6
+    --local bg = display.newRect( midX, midY, width, height )
+    --bg:setFillColor( 1,1,1 )
+    --bg.alpha = 0.6
 
     local usernameField = native.newTextField( midX, midY-240, 2/3*width, 120 )
     usernameField.font = native.newFont( native.systemFontBold, 24 )
     usernameField.inputType = "email"
-    usernameField.placeholder = " e-mail@gmail.com "
+    usernameField.placeholder = " Email "
     usernameField:setTextColor( 0.4, 0.4, 0.8 )
     -- usernameField:addEventListener( "userInput", onUsername )
 
     local nicknameField = native.newTextField( midX, midY-100, 2/3*width, 120 )
     nicknameField.font = native.newFont( native.systemFontBold, 24 )
     nicknameField.inputType = "text"
-    nicknameField.placeholder = " John Doe "
+    nicknameField.placeholder = " Username "
     nicknameField:setTextColor( 0.4, 0.4, 0.8 )
 
     local passwordField = native.newTextField( midX, midY+40, 2/3*width, 120 )
@@ -81,45 +82,47 @@ function scene:create( event )
     -- --passwordField:addEventListener( "userInput", onPassword )
 
     local function SubForm( event )
-        local options =
-        {
+        if (event.phase == "ended") then
+            local options =
+            {
 
-            effect = "fromRight",
-            time = 500,
-            params = {username=usernameField.text}
-        }
+                effect = "fromRight",
+                time = 500,
+                params = {username=usernameField.text}
+            }
 
-        if ( "ended" == event.phase ) then
-            if (usernameField.text == "text" or nicknameField.text == "text" or passwordField.text == "text" ) then
+            if ( "ended" == event.phase ) then
+                if (usernameField.text == "text" or nicknameField.text == "text" or passwordField.text == "text" ) then
 
-            else
-                sendInfo = {["email"] = usernameField.text, ["nickname"] = nicknameField.text, ["password"] = passwordField.text }
-            
-                print (sendInfo)
-                local function networkListener(event)
-                    if (event.isError) then
-                        print("Network Error!")
-                    else
-                        print ("Response: " ..event.response )
-                        nicknameField.isVisible = false
-                        usernameField.isVisible = false
-                        passwordField.isVisible = false
-                        composer.gotoScene( "home" , options)
+                else
+                    sendInfo = {["email"] = usernameField.text, ["nickname"] = nicknameField.text, ["password"] = passwordField.text }
+                
+                    print (sendInfo)
+                    local function networkListener(event)
+                        if (event.isError) then
+                            print("Network Error!")
+                        else
+                            print ("Response: " ..event.response )
+                            nicknameField.isVisible = false
+                            usernameField.isVisible = false
+                            passwordField.isVisible = false
+                            composer.gotoScene( "home" , options)
+                        end
                     end
+                    local headers = {
+                        ["Content-Type"] = "application/json"
+                    }
+
+                    local params = {}
+                    params.headers=headers
+                    params.body=json.encode( sendInfo )
+
+                    print ( "params.body: "..params.body )
+
+                    network.request( "http://geocash.elasticbeanstalk.com/users/add", "POST", networkListener, params)
                 end
-                local headers = {
-                    ["Content-Type"] = "application/json"
-                }
-
-                local params = {}
-                params.headers=headers
-                params.body=json.encode( sendInfo )
-
-                print ( "params.body: "..params.body )
-
-                network.request( "http://geocash.elasticbeanstalk.com/users/add", "POST", networkListener, params)
-            end
-        end  
+            end 
+        end 
     end
 
     local rSub = display.newRect(midX, midY+200,  2/3*width, 100)
@@ -158,7 +161,7 @@ function scene:create( event )
     group:insert( usernameField )
     group:insert( nicknameField )
     group:insert( passwordField )
-    group:insert( bg )
+    --group:insert( bg )
     -----------------------------------------------------------------------------
 
     --  CREATE display objects and add them to 'group' here.

@@ -30,6 +30,19 @@ function scene:show(event)
     local group = self.view
     myMap.x = midX
     myMap.y = midY
+    if event.params ~= nil and event.params.latitude ~= nil then
+        local options = 
+        { 
+            title = decoded.objects[i].name, 
+            subtitle = decoded.objects[i].description, 
+        }
+        local result, errorMessage = myMap:addMarker(tonumber(event.params.latitude), tonumber(event.params.longitude), options )
+        if ( result ) then
+            print( "Marker added" )
+        else
+            print( errorMessage )
+        end
+    end
 end
 
 -- Called when the scene's view does not exist:
@@ -191,7 +204,7 @@ function scene:create( event )
     local accGroup = display.newGroup( )
     local dblvl = 1
 
-    local accIMG = "Img/acc.png"
+    --local accIMG = "Img/acc.png"
     panel.background = display.newRect( 0, 0, panel.width, panel.height )
     panel.background:setFillColor( .698, .875, .859 )
     accGroup:insert( panel.background )
@@ -200,10 +213,10 @@ function scene:create( event )
     panel.accBg:setFillColor( 0,.59,.53 )
     accGroup:insert( panel.accBg )
 
-    panel.accPic = display.newImageRect( accIMG, 100, 100 )
-    panel.accPic.x = -180
-    panel.accPic.y = -480
-    accGroup:insert( panel.accPic )
+    --panel.accPic = display.newImageRect( accIMG, 100, 100 )
+    --panel.accPic.x = -180
+    --panel.accPic.y = -480
+    --accGroup:insert( panel.accPic )
 
     local name = event.params.username
     panel.accName = display.newText( name , 40, -510, native.systemFontBold, 45 )

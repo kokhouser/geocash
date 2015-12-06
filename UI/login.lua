@@ -47,6 +47,12 @@ function scene:create( event )
 	    end
 	end
 
+	display.setDefault( "background", 0.77,0.92,0.84 )
+	local appIcon = "Img/icon_marker.png"
+	local appPic = display.newImageRect( appIcon, 150, 250 )
+	appPic.x = midX
+	appPic.y = midY - 400
+
 	local usernameField = native.newTextField( midX, midY- 100, 2/3*width, 120 )
 	usernameField.font = native.newFont( native.systemFontBold, 24 )
 	usernameField.inputType = "email"
@@ -54,7 +60,7 @@ function scene:create( event )
 	usernameField:setTextColor( 0.4, 0.4, 0.8 )
 	usernameField:addEventListener( "userInput", onUsername )
 
-	local passwordField = native.newTextField( midX, midY+40, 2/3*width, 120 )
+	local passwordField = native.newTextField( midX, midY+80, 2/3*width, 120 )
 	passwordField.font = native.newFont( native.systemFontBold, 24 )
 	passwordField.inputType = "default"
 	passwordField.placeholder = " Password "
@@ -62,7 +68,7 @@ function scene:create( event )
 	passwordField:setTextColor( 0.4, 0.4, 0.8 )
 	passwordField:addEventListener( "userInput", onPassword )
 
-	local submit = display.newRect(midX, midY+200,  2/3*width, 100)
+	--local submit = display.newRect(midX, midY+240,  2/3*width, 100)
 
 	
 
@@ -100,8 +106,10 @@ function scene:create( event )
 
 	    local function networkListener(event)
 	    	if (event.isError) then
+	    		local alert = native.showAlert( "Error", "Error logging in!", {"OK"})
 	    		print("Network Error!")
 	    	elseif event.response == "Error logging in." then
+	    		local alert = native.showAlert( "Error", "Error logging in!", {"OK"})
 	    		print("Wrong User/Pass.")
 	    	else
 	    		print ("Response: " ..event.response )
@@ -128,14 +136,14 @@ function scene:create( event )
 		print ( "params.body: "..params.body )
 
 		network.request( "http://geocash.elasticbeanstalk.com/login", "POST", networkListener, params)
-	end
+		end
 	end
 
 
 	local login = widget.newButton
 	{
 	    x = midX,
-	    y = midY+200,
+	    y = midY+240,
 	    width= 2/3*width,
 	    height = 100,
 	    id = "login",
@@ -143,14 +151,14 @@ function scene:create( event )
 	    labelAlign = "center",
 	    labelColor = { default={ black }, over={ black } },
 	    fontSize = 50,
-	    onRelease = loginhere
+	    onEvent = loginhere
 	}
 
 	
 	local Register = widget.newButton
 	{
 	    x = midX,
-	    y = midY+320,
+	    y = midY+380,
 	    width= 2/3*width,
 	    height = 100,
 	    id = "Register",
@@ -158,12 +166,14 @@ function scene:create( event )
 	    labelAlign = "center",
 	    labelColor = { default={ 0, .50, 1 }, over={ 1,1,1 } },
 	    fontSize = 50,
-	    onRelease = Signuphere
+	    onRelease = Signuphere,
+	    textOnly = true
 	}
 
+	mainGroup:insert( appPic )
 	mainGroup:insert(usernameField)
 	mainGroup:insert(passwordField)
-	mainGroup:insert(submit)
+	--mainGroup:insert(submit)
 	mainGroup:insert(login)
 	mainGroup:insert(Register)
 	group:insert(mainGroup)
